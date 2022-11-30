@@ -4,7 +4,8 @@ import (
 	"errors"
 
 	"github.com/aryaw/urlshortner/config"
-	"github.com/aryaw/urlshortner/src/user"
+	"github.com/aryaw/urlshortner/src/authuser"
+	"github.com/aryaw/urlshortner/src/forms"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -20,11 +21,9 @@ type User struct {
 
 type UserModel struct{}
 
-var authModel = new(AuthModel)
+func (m UserModel) UserLogin(form forms.LoginForm) (user User, token forms.Token, err error) {
 
-func (m UserModel) Login(form forms.LoginForm) (user User, token Token, err error) {
-
-	err = db.GetDB().SelectOne(&user, "SELECT id, email, password, name, updated_at, created_at FROM public.user WHERE email=LOWER($1) LIMIT 1", form.Email)
+	err = config.GetDB().SelectOne(&user, "SELECT id, email, password, name, updated_at, created_at FROM public.user WHERE email=LOWER($1) LIMIT 1", form.Email)
 
 	if err != nil {
 		return user, token, err
@@ -41,12 +40,12 @@ func (m UserModel) Login(form forms.LoginForm) (user User, token Token, err erro
 	}
 
 
-	tokenDetails, err := authModel.CreateToken(user.ID)
+	tokenDetails, err := authuser.CreateToken(user.ID)
 	if err != nil {
 		return user, token, err
 	}
 
-	saveErr := authModel.CreateAuth(user.ID, tokenDetails)
+	saveErr := authuser.CreateAuth(user.ID, tokenDetails)
 	if saveErr == nil {
 		token.AccessToken = tokenDetails.AccessToken
 		token.RefreshToken = tokenDetails.RefreshToken
@@ -55,8 +54,8 @@ func (m UserModel) Login(form forms.LoginForm) (user User, token Token, err erro
 	return user, token, nil
 }
 
-func (m UserModel) Register(form forms.RegisterForm) (user User, err error) {
-	getDb := db.GetDB()
+func (m UserModel) UserRegister(form forms.RegisterForm) (user User, err error) {
+	getDb := config.GetDB()
 
 
 	checkUser, err := getDb.SelectInt("SELECT count(id) FROM public.user WHERE email=LOWER($1) LIMIT 1", form.Email)
@@ -86,7 +85,7 @@ func (m UserModel) Register(form forms.RegisterForm) (user User, err error) {
 	return user, err
 }
 
-func (m UserModel) One(userID int64) (user User, err error) {
-	err = db.GetDB().SelectOne(&user, "SELECT id, email, name FROM public.user WHERE id=$1 LIMIT 1", userID)
+func (m UserModel) UserOne(userID int64) (user User, err error) {
+	err = config.GetDB().SelectOne(&user, "SELECT id, email, name FROM public.user WHERE id=$1 LIMIT 1", userID)
 	return user, err
 }

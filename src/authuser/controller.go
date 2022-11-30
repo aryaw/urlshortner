@@ -8,7 +8,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	jwt "github.com/golang-jwt/jwt/v4"
-	"github.com/aryaw/urlshortner/src/form"
+	"github.com/aryaw/urlshortner/src/forms"
 )
 
 type AuthController struct{}
