@@ -8,7 +8,8 @@ import (
 	"strings"
 	"time"
 
-	"urlshortner/config"
+	"github.com/aryaw/urlshortner/config"
+	"github.com/aryaw/urlshortner/src/form"
 	jwt "github.com/golang-jwt/jwt/v4"
 	uuid "github.com/twinj/uuid"
 )

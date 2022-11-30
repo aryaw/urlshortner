@@ -1,11 +1,13 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 
-	"urlshortner/middleware"
-	"urlshortner/config"
+	"github.com/aryaw/urlshortner/middleware"
+	"github.com/aryaw/urlshortner/config"
+	"github.com/aryaw/urlshortner/src/authuser"
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -33,4 +35,22 @@ func main() {
     h := config.New(DB)
 	
 	config.InitRedis(1)
+
+	v1 := r.Group("/v1")
+	{
+		authuser := new(authuser.UserController)
+
+		v1.POST("/user/login", user.Login)
+		v1.POST("/user/register", user.Register)
+		v1.GET("/user/logout", user.Logout)
+
+		auth := new(authuser.AuthController)
+
+		v1.POST("/token/refresh", authuser.Refresh)
+	}
+	port := os.Getenv("PORT")
+	log.Printf("\n\n PORT: %s \n ENV: %s \n SSL: %s \n Version: %s \n\n", port, os.Getenv("ENV"), os.Getenv("SSL"), os.Getenv("API_VERSION"))
+	r.Run(":" + port)
+
+	r.Routes()
 }

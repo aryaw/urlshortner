@@ -2,12 +2,13 @@ package authuser
 
 import (
 	"fmt"
-	"net/http"
 	"os"
 	"strconv"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 	jwt "github.com/golang-jwt/jwt/v4"
+	"github.com/aryaw/urlshortner/src/form"
 )
 
 type AuthController struct{}
@@ -95,4 +96,5 @@ func (ctl AuthController) Refresh(c *gin.Context) {
 	} else {
 		c.JSON(http.StatusUnauthorized, gin.H{"message": "Invalid authorization, please login again"})
 	}
+	// c.JSON(http.StatusUnauthorized, gin.H{"message": "Invalid authorization, please login again"})
 }
